@@ -2,10 +2,13 @@ import {gql} from 'apollo-server';
 
 export const postDefs = gql`
     type Query {
-        post: Post!
+        getPosts: [Post!]!
     }
 
     type Post {
-        name: String!
+        _id: ID!
+        body: String!
+        createdAt: String!
+        username: String!
     }
 `

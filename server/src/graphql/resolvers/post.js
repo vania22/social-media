@@ -1,7 +1,10 @@
 export const post = {
     Query: {
-        post() {
-            return {name: 'User'}
+        async getPosts(parent, args, {posts}, info) {
+            return posts.find().toArray();
         }
+    },
+    Post: {
+
     }
 }

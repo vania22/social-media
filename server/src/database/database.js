@@ -11,14 +11,7 @@ export const dbConnection = async () => {
             useUnifiedTopology: true,
             useFindAndModify: false,
         })
-
-        console.log('Successfully connected to DB')
-
-        const {db} = mongoose.connection;
-
-        return {
-            posts: db.collection('posts')
-        }
+        console.log('Connected to Database')
     } catch (e) {
         throw new Error('Failed connecting to Database \n' + e.message)
     }
