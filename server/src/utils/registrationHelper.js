@@ -31,7 +31,6 @@ export const registrateUser = async (input) => {
         ...input,
         email,
         password,
-        createdAt: new Date().toISOString()
     });
 
     // Saving user to Database

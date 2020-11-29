@@ -2,18 +2,23 @@ import {model, Schema} from 'mongoose';
 
 const postSchema = new Schema({
     body: String,
-    username: String,
     createdAt: String,
     comments: [
         {
             body: String,
-            username: String,
+            user: {
+                type: Schema.ObjectId,
+                ref: 'users',
+            },
             createdAt: String
         }
     ],
     likes: [
         {
-            username: String,
+            user: {
+                type: Schema.ObjectId,
+                ref: 'users'
+            },
             createdAt: String
         }
     ],
@@ -21,7 +26,7 @@ const postSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'users'
     }
-});
+}, {timestamps: true});
 
 const Post = model('Post', postSchema);
 
