@@ -1,10 +1,11 @@
 import {registrateUser} from "../../utils/registrationHelper";
 import {loginUser} from "../../utils/loginHelper";
+import {isAuthenticated} from "../../utils/isAuthenticated";
 
 export const user = {
     Query: {
-        user() {
-            return {name: 'User'}
+        async me(parent, args, {req}, info) {
+            return await isAuthenticated(req)
         }
     },
     Mutation: {
