@@ -52,6 +52,12 @@ export const post = {
             }
 
             return user
+        },
+        commentsCount(parent) {
+            return parent.comments.length
+        },
+        likesCount(parent) {
+            return parent.likes.length
         }
     }
 }

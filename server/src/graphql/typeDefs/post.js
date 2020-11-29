@@ -17,5 +17,8 @@ export const postDefs = gql`
         createdAt: String!
         user: User!
         comments: [Comment]!
+        commentsCount: Int!
+        likes: [Like]!
+        likesCount: Int!
     }
 `
