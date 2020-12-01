@@ -26,5 +26,16 @@ export const like = {
 
             return post
         }
+    },
+    Like: {
+        async user(parent, args, {User}, info) {
+            const user = await User.findById(parent.user)
+
+            if (!user) {
+                throw new Error('User for created post not found')
+            }
+
+            return user
+        }
     }
 }
