@@ -11,6 +11,12 @@ export const registrateUser = async (input) => {
         throw new Error('Please provide valid details')
     }
 
+    // Validating if username isn't taken
+    const existingUsername = await User.findOne({username});
+    if (existingUsername) {
+        throw new Error('User with given username already exists')
+    }
+
     // Validating if email isn't taken
     email = email.toLowerCase();
     const existingUserEmail = await User.findOne({email});
@@ -18,10 +24,7 @@ export const registrateUser = async (input) => {
         throw new Error('User with given email already exists')
     }
 
-    const existingUsername = await User.findOne({username});
-    if (existingUsername) {
-        throw new Error('User with given username already exists')
-    }
+
 
     // Hashing password
     password = await bcrypt.hash(password, 10);

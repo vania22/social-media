@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import validator from 'validator';
+import classnames from 'classnames'
 import {Link} from 'react-router-dom';
 import gql from "graphql-tag";
 import {useMutation} from '@apollo/client'
@@ -16,6 +17,7 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 
 function Copyright() {
@@ -55,6 +57,11 @@ const useStyles = makeStyles((theme) => ({
     form: {
         width: '100%',
         marginTop: theme.spacing(1),
+        position: 'relative',
+        zIndex: 0
+    },
+    formLoading: {
+        opacity: '0.8'
     },
     input: {
         '& label': {
@@ -82,11 +89,18 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             textDecoration: 'underline'
         }
+    },
+    loader: {
+        position: 'absolute',
+        top: '15%',
+        left: '45%',
+        zIndex: 10,
+        color: theme.palette.secondary.light
     }
 }));
 
 export default function Login({register}) {
-    const classes = useStyles();
+    const classes = useStyles(register);
     const [values, setValues] = useState({username: '', email: '', password: ''})
     const [error, setError] = useState({})
 
@@ -129,7 +143,6 @@ export default function Login({register}) {
 
         // If prop "register" === true, then execute registerUser query, else - execute loginUser
         if (register) {
-            console.log('Register')
             registerUser()
                 .then(({data}) => {
                     console.log(data)
@@ -142,7 +155,6 @@ export default function Login({register}) {
                     }
                 })
         } else {
-            console.log('Login')
             loginUser()
                 .then(({data}) => {
                     console.log(data)
@@ -165,7 +177,12 @@ export default function Login({register}) {
                     <Typography component="h1" variant="h5" color='secondary'>
                         {register ? 'Sign Up' : 'Sign In'}
                     </Typography>
-                    <form className={classes.form} noValidate color='secondary' onSubmit={e => onSubmit(e)}>
+                    <form
+                        className={classnames(classes.form, registerLoading || loginLoading ? classes.formLoading : null)}
+                        noValidate
+                        color='secondary'
+                        onSubmit={e => onSubmit(e)}
+                    >
                         {register &&
                         <TextField
                             variant="filled"
@@ -173,6 +190,7 @@ export default function Login({register}) {
                             required
                             fullWidth
                             autoFocus
+                            noValidate
                             name="username"
                             label="Username"
                             type="text"
@@ -195,6 +213,7 @@ export default function Login({register}) {
                             label="Email Address"
                             name="email"
                             autoComplete="off"
+                            noValidate
                             autoFocus={!register}
                             color='secondary'
                             className={classes.input}
@@ -208,6 +227,7 @@ export default function Login({register}) {
                             margin="normal"
                             required
                             fullWidth
+                            noValidate
                             name="password"
                             label="Password"
                             type="password"
@@ -257,6 +277,10 @@ export default function Login({register}) {
                         <Box mt={5}>
                             <Copyright/>
                         </Box>
+                        {loginLoading || registerLoading ?
+                            <CircularProgress color="secondary" size={50} className={classes.loader}/>
+                            : null
+                        }
                     </form>
                 </div>
             </Grid>
