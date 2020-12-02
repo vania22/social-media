@@ -95,7 +95,14 @@ export default function Login({register}) {
         setValues((prevState => ({...prevState, [e.target.name]: e.target.value})))
     }
 
-    const [registerUser, {loading}] = useMutation(REGISTER_USER, {
+    const [registerUser, {loading: registerLoading}] = useMutation(REGISTER_USER, {
+        update(proxy, result) {
+            console.log(result)
+        },
+        variables: values
+    })
+
+    const [loginUser, {loading: loginLoading}] = useMutation(LOGIN_USER, {
         update(proxy, result) {
             console.log(result)
         },
@@ -120,18 +127,30 @@ export default function Login({register}) {
             return
         }
 
-
-        registerUser()
-            .then(({data}) => {
-                console.log(data)
-            })
-            .catch((e)=> {
-            if(e.message.includes('email')){
-                setError((prevState => ({...prevState, email: e.message})))
-            } else if(e.message.includes('username')) {
-                setError((prevState => ({...prevState, username: e.message})))
-            }
-        })
+        // If prop "register" === true, then execute registerUser query, else - execute loginUser
+        if (register) {
+            console.log('Register')
+            registerUser()
+                .then(({data}) => {
+                    console.log(data)
+                })
+                .catch((e) => {
+                    if (e.message.includes('email')) {
+                        setError((prevState => ({...prevState, email: e.message})))
+                    } else if (e.message.includes('username')) {
+                        setError((prevState => ({...prevState, username: e.message})))
+                    }
+                })
+        } else {
+            console.log('Login')
+            loginUser()
+                .then(({data}) => {
+                    console.log(data)
+                })
+                .catch((e) => {
+                    setError((prevState => ({...prevState, email: e.message, password: e.message})))
+                })
+        }
     }
 
     return (
@@ -256,6 +275,26 @@ const REGISTER_USER = gql`
                 username: $username
                 email: $email
                 password: $password
+            }
+        ){
+            _id
+            email
+            username
+            createdAt
+            token
+        }
+    }
+`
+
+const LOGIN_USER = gql`
+    mutation login(
+        $password: String!
+        $email: String!
+    ) {
+        login(
+            input: {
+                password: $password
+                email: $email
             }
         ){
             _id
