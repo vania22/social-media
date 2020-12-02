@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import validator from 'validator';
+import {Link} from 'react-router-dom';
+import gql from "graphql-tag";
+import {useMutation} from '@apollo/client'
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -7,19 +10,20 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
+
 
 function Copyright() {
+    const classes = useStyles();
     return (
         <Typography variant="body2" color='secondary' align="center">
             Copyright ©
-            <Link color="inherit" href="https://socialize.com/">
+            <Link to="https://socialize.com/" className={classes.link}>
                 Socialize{' '}
             </Link>
             {new Date().getFullYear()}
@@ -64,21 +68,39 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     checkbox: {
-      color: '#fff',
+        color: '#fff',
         '& svg': {
-          color: '#fff'
+            color: '#fff'
         }
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    link: {
+        textDecoration: 'none',
+        color: '#fff',
+        '&:hover': {
+            textDecoration: 'underline'
+        }
+    }
 }));
 
 export default function Login({register}) {
     const classes = useStyles();
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [values, setValues] = useState({username: '', email: '', password: ''})
     const [error, setError] = useState({})
+
+    const onInputChange = (e) => {
+        setError({})
+        setValues((prevState => ({...prevState, [e.target.name]: e.target.value})))
+    }
+
+    const [registerUser, {loading}] = useMutation(REGISTER_USER, {
+        update(proxy, result) {
+            console.log(result)
+        },
+        variables: values
+    })
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -87,40 +109,64 @@ export default function Login({register}) {
         setError(false)
 
         // Field validations
-        if(!email.trim() || !validator.isEmail(email)) {
+        if (register && !values.username.trim()) {
+            setError((prev) => ({...prev, username: 'Please provide a valid username'}))
+            return
+        } else if (!values.email.trim() || !validator.isEmail(values.email)) {
             setError((prev) => ({...prev, email: 'Please provide a valid email'}))
             return
-        } else if(!password.trim()){
-            setError((prev) => ({ ...prev, password: 'Please provide a valid password'}))
+        } else if (!values.password.trim()) {
+            setError((prev) => ({...prev, password: 'Please provide a valid password'}))
             return
         }
 
-        console.log('hello')
-    }
 
-    const onEmailChange = (e) => {
-        setError({})
-        setEmail(e.target.value)
-    }
-
-    const onPasswordChange = (e) => {
-        setError({})
-        setPassword(e.target.value)
+        registerUser()
+            .then(({data}) => {
+                console.log(data)
+            })
+            .catch((e)=> {
+            if(e.message.includes('email')){
+                setError((prevState => ({...prevState, email: e.message})))
+            } else if(e.message.includes('username')) {
+                setError((prevState => ({...prevState, username: e.message})))
+            }
+        })
     }
 
     return (
         <Grid container component="main" className={classes.root} style={{height: 'calc(100vh - 64px)'}}>
-            <CssBaseline />
-            <Grid item xs={false} sm={4} md={7} xl={8} className={classes.image} />
+            <CssBaseline/>
+            <Grid item xs={false} sm={4} md={7} xl={8} className={classes.image}/>
             <Grid item xs={12} sm={8} md={5} xl={4} component={Paper} elevation={6} square>
                 <div className={classes.paper}>
                     <Avatar className={classes.avatar}>
-                        <LockOutlinedIcon color='secondary' />
+                        <LockOutlinedIcon color='secondary'/>
                     </Avatar>
                     <Typography component="h1" variant="h5" color='secondary'>
-                        Sign in
+                        {register ? 'Sign Up' : 'Sign In'}
                     </Typography>
                     <form className={classes.form} noValidate color='secondary' onSubmit={e => onSubmit(e)}>
+                        {register &&
+                        <TextField
+                            variant="filled"
+                            margin="normal"
+                            required
+                            fullWidth
+                            autoFocus
+                            name="username"
+                            label="Username"
+                            type="text"
+                            id="username"
+                            autoComplete="off"
+                            className={classes.input}
+                            color='secondary'
+                            value={values.username}
+                            onChange={(e) => onInputChange(e)}
+                            error={!!error.username}
+                            helperText={error.username}
+                        />
+                        }
                         <TextField
                             variant="filled"
                             margin="normal"
@@ -130,11 +176,11 @@ export default function Login({register}) {
                             label="Email Address"
                             name="email"
                             autoComplete="off"
-                            autoFocus
+                            autoFocus={!register}
                             color='secondary'
                             className={classes.input}
-                            value={email}
-                            onChange={(e) => onEmailChange(e)}
+                            value={values.email}
+                            onChange={(e) => onInputChange(e)}
                             error={!!error.email}
                             helperText={error.email}
                         />
@@ -147,20 +193,22 @@ export default function Login({register}) {
                             label="Password"
                             type="password"
                             id="password"
-                            autoComplete="current-password"
+                            autoComplete="off"
                             className={classes.input}
                             color='secondary'
-                            value={password}
-                            onChange={(e) => onPasswordChange(e)}
+                            value={values.password}
+                            onChange={(e) => onInputChange(e)}
                             error={!!error.password}
                             helperText={error.password}
                         />
+                        {!register &&
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="secondary" />}
+                            control={<Checkbox value="remember" color="secondary"/>}
                             label="Remember me"
                             color='secondary'
                             className={classes.checkbox}
                         />
+                        }
                         <Button
                             type="submit"
                             fullWidth
@@ -169,22 +217,26 @@ export default function Login({register}) {
                             className={classes.submit}
                             disabled={!!error.email || !!error.password}
                         >
-                            Sign In
+                            {register ? 'Sign Up' : 'Sign In'}
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2" color='secondary'>
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="#" variant="body2" color='secondary'>
-                                    Don't have an account? Sign Up
-                                </Link>
-                            </Grid>
+                            {register ?
+                                <Grid item>
+                                    <Link to="/login" className={classes.link}>
+                                        Have an account? Sign In
+                                    </Link>
+                                </Grid>
+                                :
+                                <Grid item>
+                                    <Link to="/register" className={classes.link}>
+                                        Don't have an account? Sign Up
+                                    </Link>
+                                </Grid>
+                            }
+
                         </Grid>
                         <Box mt={5}>
-                            <Copyright />
+                            <Copyright/>
                         </Box>
                     </form>
                 </div>
@@ -192,3 +244,25 @@ export default function Login({register}) {
         </Grid>
     );
 }
+
+const REGISTER_USER = gql`
+    mutation register(
+        $username: String!
+        $email: String!
+        $password: String!
+    ) {
+        register(
+            input: {
+                username: $username
+                email: $email
+                password: $password
+            }
+        ){
+            _id
+            email
+            username
+            createdAt
+            token
+        }
+    }
+`

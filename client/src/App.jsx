@@ -6,7 +6,6 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import MenuBar from "./components/MenuBar";
 
 import {theme} from "./theme";
@@ -20,7 +19,7 @@ const App = () => {
                       <MenuBar/>
                       <Route exact path='/' component={Home}/>
                       <Route exact path='/login' component={Login}/>
-                      <Route exact path='/register' component={Register}/>
+                      <Route exact path='/register' render={() => <Login register/>}/>
                   </div>
               </Router>
           </ThemeProvider>
