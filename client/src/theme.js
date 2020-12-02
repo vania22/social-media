@@ -4,14 +4,15 @@ export const theme = createMuiTheme({
     palette: {
         primary: {
             main: '#2D2A32',
-
+            gray: '#C6C6C6',
+            like: '#e63946'
         },
         background: {
-            default: '#BFCBC2',
-            paper: '#BFCBC2'
+            default: '#393E41',
+            paper: '#393E41'
         },
         secondary: {
-            main: '#BFCBC2',
+            main: '#fff',
             light: '#B23A48'
         },
 

@@ -6,6 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 
 import classnames from 'classnames'
 
@@ -31,7 +32,12 @@ const useStyles = makeStyles((theme) => ({
         '& a, a:visited': {
             textDecoration: 'none',
             color: '#fff',
+            display: 'flex'
         },
+    },
+    logo: {
+        marginRight: 10,
+        fontSize: 28
     },
     appButton: {
         color: '#fff',
@@ -58,6 +64,7 @@ export default function ButtonAppBar() {
 
                     <Typography variant="h6" className={classes.title}>
                         <Link to='/'>
+                            <EmojiPeopleIcon className={classes.logo}/>
                             Socialize
                         </Link>
                     </Typography>
