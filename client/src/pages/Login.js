@@ -1,7 +1,7 @@
 import React, {useState, useContext} from 'react';
 import validator from 'validator';
 import classnames from 'classnames'
-import {Link, useHistory} from 'react-router-dom';
+import {Link, useHistory, Redirect} from 'react-router-dom';
 import gql from "graphql-tag";
 import {useMutation} from '@apollo/client'
 
@@ -20,8 +20,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {AlertContext} from "../context/AlertContext";
 
-
+// Copyright component - the one which is below the form
 function Copyright() {
     const classes = useStyles();
     return (
@@ -103,16 +104,20 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login({register}) {
     const classes = useStyles(register);
-    const {login} = useContext(AuthContext)
+    const {user, login} = useContext(AuthContext)
     const history = useHistory()
     const [values, setValues] = useState({username: '', email: '', password: ''})
     const [error, setError] = useState({})
+    const {setAlert} = useContext(AlertContext)
 
+
+    // Generic input handler for all inputs
     const onInputChange = (e) => {
         setError({})
         setValues((prevState => ({...prevState, [e.target.name]: e.target.value})))
     }
 
+    // Mutation request for registering
     const [registerUser, {loading: registerLoading}] = useMutation(REGISTER_USER, {
         update(proxy, result) {
             console.log(result)
@@ -120,12 +125,14 @@ export default function Login({register}) {
         variables: values
     })
 
+    // Mutation request for login
     const [loginUser, {loading: loginLoading}] = useMutation(LOGIN_USER, {
         update(proxy, result) {
         },
         variables: values
     })
 
+    // Form submit handler
     const onSubmit = (e) => {
         e.preventDefault()
 
@@ -165,9 +172,15 @@ export default function Login({register}) {
                     history.push('/')
                 })
                 .catch((e) => {
+                    setAlert(e.message, 'error')
                     setError((prevState => ({...prevState, email: e.message, password: e.message})))
                 })
         }
+    }
+
+    // If user is logged in, redirect to home
+    if (user) {
+        return <Redirect to='/'/>
     }
 
     return (

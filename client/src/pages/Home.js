@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useQuery} from "@apollo/client";
 import gql from 'graphql-tag'
 
@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 
 import PostCard from "../components/PostCard";
 import PostCardSkeleton from "../components/PostCardSkeleton";
+import {AlertContext} from "../context/AlertContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
