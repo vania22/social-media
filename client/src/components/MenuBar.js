@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {useLocation, Link} from 'react-router-dom'
 
 import {makeStyles} from '@material-ui/core/styles';
@@ -10,6 +10,7 @@ import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 
 import classnames from 'classnames'
 
+import {AuthContext} from "../context/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ButtonAppBar() {
     const classes = useStyles();
     const {pathname} = useLocation()
+    const {user, logout} = useContext(AuthContext)
 
     return (
         <div className={classes.root}>
@@ -77,14 +79,36 @@ export default function ButtonAppBar() {
                             Home
                         </Button>
                     </Link>
-                    <Link to='/login'>
-                        <Button
-                            name='Login'
-                            className={classnames(classes.appButton, pathname === '/login' && classes.appButtonActive)}
-                        >
-                            Login
-                        </Button>
-                    </Link>
+                    {!user ?
+                        <Link to='/login'>
+                            <Button
+                                name='Login'
+                                className={classnames(classes.appButton, pathname === '/login' && classes.appButtonActive)}
+                            >
+                                Login
+                            </Button>
+                        </Link>
+                        :
+                        <>
+                            <Link to='/user'>
+                                <Button
+                                    name='User'
+                                    className={classnames(classes.appButton, pathname === '/user' && classes.appButtonActive)}
+                                >
+                                    My profile
+                                </Button>
+                            </Link>
+                            <Link to='/'>
+                                <Button
+                                    name='Login'
+                                    onClick={logout}
+                                    className={classes.appButton}
+                                >
+                                    LogOut
+                                </Button>
+                            </Link>
+                        </>
+                    }
                 </Toolbar>
             </AppBar>
         </div>

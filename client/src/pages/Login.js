@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import validator from 'validator';
 import classnames from 'classnames'
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import gql from "graphql-tag";
 import {useMutation} from '@apollo/client'
+
+import {AuthContext} from "../context/AuthContext";
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -101,6 +103,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login({register}) {
     const classes = useStyles(register);
+    const {login} = useContext(AuthContext)
+    const history = useHistory()
     const [values, setValues] = useState({username: '', email: '', password: ''})
     const [error, setError] = useState({})
 
@@ -118,7 +122,6 @@ export default function Login({register}) {
 
     const [loginUser, {loading: loginLoading}] = useMutation(LOGIN_USER, {
         update(proxy, result) {
-            console.log(result)
         },
         variables: values
     })
@@ -145,7 +148,8 @@ export default function Login({register}) {
         if (register) {
             registerUser()
                 .then(({data}) => {
-                    console.log(data)
+                    login(data.register)
+                    history.push('/')
                 })
                 .catch((e) => {
                     if (e.message.includes('email')) {
@@ -157,7 +161,8 @@ export default function Login({register}) {
         } else {
             loginUser()
                 .then(({data}) => {
-                    console.log(data)
+                    login(data.login)
+                    history.push('/')
                 })
                 .catch((e) => {
                     setError((prevState => ({...prevState, email: e.message, password: e.message})))
