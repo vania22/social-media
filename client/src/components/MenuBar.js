@@ -7,10 +7,12 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
+import AddIcon from '@material-ui/icons/Add';
 
 import classnames from 'classnames'
 
 import {AuthContext} from "../context/AuthContext";
+import CreatePostModal from "./CreatePostModal";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
     appbar: {
         paddingLeft: 30,
+        flexGrow: 1,
         paddingRight: 30,
         '& a': {
             textDecoration: 'none'
@@ -45,8 +48,14 @@ const useStyles = makeStyles((theme) => ({
         marginRight: 10,
     },
     appButtonActive: {
+        borderBottomRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottom: '1px solid #fff',
+    },
+    primaryButton: {
         background: '#fff',
         color: theme.palette.primary.main,
+        margin: '0 10px',
         '&:hover': {
             background: '#fff',
             color: theme.palette.primary.main,
@@ -58,18 +67,35 @@ export default function ButtonAppBar() {
     const classes = useStyles();
     const {pathname} = useLocation()
     const {user, logout} = useContext(AuthContext)
+    const [dialogOpen, setDialogOpen] = useState(false)
+
+    const openDialog = () => {
+        setDialogOpen(true)
+    }
+
+    const closeDialog = () => {
+        setDialogOpen(false)
+    }
 
     return (
         <div className={classes.root}>
             <AppBar position="static" className={classes.appbar}>
                 <Toolbar>
-
                     <Typography variant="h6" className={classes.title}>
                         <Link to='/'>
                             <EmojiPeopleIcon className={classes.logo}/>
                             Socialize
                         </Link>
                     </Typography>
+                    {user &&
+                            <Button
+                                className={classes.primaryButton}
+                                startIcon={<AddIcon/>}
+                                onClick={openDialog}
+                            >
+                                Create
+                            </Button>
+                    }
 
                     <Link to='/'>
                         <Button
@@ -111,6 +137,7 @@ export default function ButtonAppBar() {
                     }
                 </Toolbar>
             </AppBar>
+            <CreatePostModal open={dialogOpen} handleClose={closeDialog}/>
         </div>
     );
 }

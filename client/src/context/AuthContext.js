@@ -6,7 +6,7 @@ export const AuthContext = React.createContext(null)
 
 const AuthContextProvider = ({children}) => {
     const {pathname} = useLocation()
-    let initialState = localStorage.getItem('user') || null
+    let initialState = JSON.parse(localStorage.getItem('user')) || null
 
     const [user, setUser] = useState(initialState)
 
@@ -14,6 +14,10 @@ const AuthContextProvider = ({children}) => {
         if (localStorage.getItem('user')) {
             const decodedToken = jwtDecode(JSON.parse(localStorage.getItem('user')).token);
             if (decodedToken.exp * 1000 < Date.now()) {
+                logout()
+            }
+        } else {
+            if(user) {
                 logout()
             }
         }
