@@ -10,6 +10,7 @@ export const FETCH_POSTS_QUERY = gql`
             likes {
                 user {
                     username
+                    _id
                 }
             }
             comments {

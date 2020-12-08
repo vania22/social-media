@@ -1,5 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {Link} from "react-router-dom";
+import moment from 'moment'
 import classnames from 'classnames'
+
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import {CardHeader, makeStyles} from "@material-ui/core";
@@ -9,11 +12,14 @@ import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ChatIcon from '@material-ui/icons/Chat';
-
-import moment from 'moment'
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
-import {Link} from "react-router-dom";
+
+import {AuthContext} from "../context/AuthContext";
+
+import {useMutation} from "@apollo/client";
+import gql from "graphql-tag";
+import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -58,9 +64,12 @@ const useStyles = makeStyles(theme => ({
         color: '#fff'
     },
     likeIcon: {
-      '&:hover': {
-          color: '#e63946'
-      }
+        '&:hover': {
+            color: '#e63946'
+        }
+    },
+    likeIconLiked: {
+        color: '#e63946'
     },
     postFooterButton: {
         color: '#fff',
@@ -72,8 +81,36 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const PostCard = ({post: {body, createdAt, commentsCount, likesCount, user, _id}}) => {
+const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, user, _id}}) => {
     const classes = useStyles()
+    const {user: currentUser} = useContext(AuthContext)
+    const hasUserLiked = !!likes.find(like => like.user._id === currentUser?._id)
+
+    const [toggleLike] = useMutation(TOGGLE_LIKE_QUERY, {
+        variables: {id: _id},
+        update(cache, result) {
+
+            const data = cache.readQuery({
+                query: FETCH_POSTS_QUERY,
+            });
+
+            // Updating posts from cache by replacing liked post from the response
+            cache.writeQuery({
+                query: FETCH_POSTS_QUERY,
+                data: {
+                    getPosts: data.getPosts.map(post => post._id === _id ? result.data.toggleLike : post),
+                },
+            });
+        }
+    })
+
+    const onLikeClick = () => {
+        if (!currentUser._id) {
+            return
+        }
+
+        toggleLike()
+    }
 
     return (
         <Grid item xl={4} md={4}>
@@ -93,8 +130,9 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, user, _id}
                     </Typography>
                 </CardContent>
                 <CardActions className={classes.cardFooter} disableSpacing>
-                    <IconButton>
-                        <FavoriteIcon className={classnames(classes.icon, classes.likeIcon)}/>
+                    <IconButton onClick={onLikeClick}>
+                        <FavoriteIcon
+                            className={classnames(hasUserLiked ? classes.likeIconLiked : classes.icon, classes.likeIcon)}/>
                         <span className={classes.count} style={{left: 30}}>{likesCount}</span>
                     </IconButton>
                     <IconButton>
@@ -106,8 +144,6 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, user, _id}
                             Read more
                         </Link>
                     </Button>
-
-
                 </CardActions>
             </Card>
         </Grid>
@@ -122,5 +158,30 @@ function getRandomColor() {
     }
     return color;
 }
+
+const TOGGLE_LIKE_QUERY = gql`
+    mutation toggleLike($id: ID!){
+        toggleLike(postId: $id){
+            _id body createdAt likesCount commentsCount
+            user {
+                username
+            }
+            likes {
+                user {
+                    username
+                    _id
+                }
+            }
+            comments {
+                _id
+                body
+                user {
+                    username
+                }
+            }
+        }
+    }
+`
+
 
 export default PostCard

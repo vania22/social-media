@@ -12,7 +12,6 @@ import Slide from "@material-ui/core/Slide";
 import TextField from "@material-ui/core/TextField";
 import {makeStyles} from "@material-ui/core";
 
-import {AuthContext} from "../context/AuthContext";
 import {AlertContext} from "../context/AlertContext";
 import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
 
@@ -63,16 +62,10 @@ const CreatePostModal = ({handleClose, open}) => {
         body: ''
     });
 
-    const {user} = useContext(AuthContext)
     const {setAlert} = useContext(AlertContext)
 
     const [createPost, {loading}] = useMutation(CREATE_POST_QUERY, {
             variables: values,
-            context: {
-                headers: {
-                    Authorization: `Bearer ${user && user.token}`
-                }
-            },
             update(cache, result) {
                 // Getting data from cache
                 const data = cache.readQuery({
