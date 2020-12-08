@@ -12,9 +12,9 @@ import Slide from "@material-ui/core/Slide";
 import TextField from "@material-ui/core/TextField";
 import {makeStyles} from "@material-ui/core";
 
-
 import {AuthContext} from "../context/AuthContext";
 import {AlertContext} from "../context/AlertContext";
+import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
 
 // Slider component used to make a slider animation for Dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -67,17 +67,32 @@ const CreatePostModal = ({handleClose, open}) => {
     const {setAlert} = useContext(AlertContext)
 
     const [createPost, {loading}] = useMutation(CREATE_POST_QUERY, {
-        variables: values,
-        context: {
-            headers: {
-                Authorization: `Bearer ${user && user.token}`
+            variables: values,
+            context: {
+                headers: {
+                    Authorization: `Bearer ${user && user.token}`
+                }
+            },
+            update(cache, result) {
+                // Getting data from cache
+                const data = cache.readQuery({
+                    query: FETCH_POSTS_QUERY,
+                });
+
+                // Updating posts from cache by adding newly created post
+                cache.writeQuery({
+                    query: FETCH_POSTS_QUERY,
+                    data: {
+                        getPosts: [result.data.createPost, ...data.getPosts],
+                    },
+                });
             }
         }
-    })
+    )
 
     const onPostCreate = () => {
-        if(values.body.trim()) {
-            createPost().then(res => console.log(res)).catch((e) => console.log(e.message))
+        if (values.body.trim()) {
+            createPost()
             handleClose()
         } else {
             setAlert("Post can't have empty body", 'error')
@@ -85,7 +100,7 @@ const CreatePostModal = ({handleClose, open}) => {
     }
 
     const handleChange = event => {
-        setValues({ ...values, [event.target.name]: event.target.value });
+        setValues({...values, [event.target.name]: event.target.value});
     };
 
     return (
@@ -97,7 +112,8 @@ const CreatePostModal = ({handleClose, open}) => {
             className={classes.root}
             PaperProps={{style: {width: 600}}}
         >
-            <DialogTitle id="alert-dialog-slide-title" className={classes.dialogTitle}>Create new post</DialogTitle>
+            <DialogTitle id="alert-dialog-slide-title" className={classes.dialogTitle}>Create new
+                post</DialogTitle>
             <DialogContent>
                 <TextField
                     label="Content"
@@ -116,13 +132,13 @@ const CreatePostModal = ({handleClose, open}) => {
                 />
             </DialogContent>
             <DialogActions style={{padding: '8px 24px', paddingBottom: '20px'}}>
-                    <Button
-                        className={classes.postButton}
-                        onClick={onPostCreate}
-                        disabled={loading}
-                    >
-                        Post!
-                    </Button>
+                <Button
+                    className={classes.postButton}
+                    onClick={onPostCreate}
+                    disabled={loading}
+                >
+                    Post!
+                </Button>
             </DialogActions>
         </Dialog>
     )
@@ -133,8 +149,22 @@ const CREATE_POST_QUERY = gql`
         $body: String!
     ) {
         createPost(body: $body) {
-            _id,
-            body
+            _id body createdAt likesCount commentsCount
+            user {
+                username
+            }
+            likes {
+                user {
+                    username
+                }
+            }
+            comments {
+                _id
+                body
+                user {
+                    username
+                }
+            }
         }
     }
 `

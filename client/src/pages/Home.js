@@ -1,6 +1,7 @@
 import React from 'react';
 import {useQuery} from "@apollo/client";
-import gql from 'graphql-tag'
+
+import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
 
 import Container from "@material-ui/core/Container";
 import {makeStyles, Typography} from "@material-ui/core";
@@ -25,7 +26,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Home = () => {
-    const {loading, data, refetch} = useQuery(FETCH_POSTS_QUERY)
+    const {loading, data} = useQuery(FETCH_POSTS_QUERY)
     const classes = useStyles()
 
     return (
@@ -46,31 +47,7 @@ const Home = () => {
                 </Grid>
             </Grid>
         </Container>
-
     )
 }
-
-const FETCH_POSTS_QUERY = gql`
-    {
-        getPosts{
-            _id body createdAt likesCount commentsCount
-            user {
-                username
-            }
-            likes {
-                user {
-                    username
-                }
-            }
-            comments {
-                _id
-                body
-                user {
-                    username
-                }
-            }
-        }
-    }
-`
 
 export default Home
