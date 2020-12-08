@@ -2,10 +2,7 @@ import React, {useState, useContext} from 'react';
 import validator from 'validator';
 import classnames from 'classnames'
 import {Link, useHistory, Redirect} from 'react-router-dom';
-import gql from "graphql-tag";
 import {useMutation} from '@apollo/client'
-
-import {AuthContext} from "../context/AuthContext";
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -20,7 +17,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import CircularProgress from "@material-ui/core/CircularProgress";
+
 import {AlertContext} from "../context/AlertContext";
+import {AuthContext} from "../context/AuthContext";
+import {LOGIN_USER, REGISTER_USER} from "../utils/graphql-queries";
 
 // Copyright component - the one which is below the form
 function Copyright() {
@@ -305,45 +305,3 @@ export default function Login({register}) {
         </Grid>
     );
 }
-
-const REGISTER_USER = gql`
-    mutation register(
-        $username: String!
-        $email: String!
-        $password: String!
-    ) {
-        register(
-            input: {
-                username: $username
-                email: $email
-                password: $password
-            }
-        ){
-            _id
-            email
-            username
-            createdAt
-            token
-        }
-    }
-`
-
-const LOGIN_USER = gql`
-    mutation login(
-        $password: String!
-        $email: String!
-    ) {
-        login(
-            input: {
-                password: $password
-                email: $email
-            }
-        ){
-            _id
-            email
-            username
-            createdAt
-            token
-        }
-    }
-`

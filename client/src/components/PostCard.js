@@ -1,5 +1,7 @@
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
+import {useMutation} from "@apollo/client";
+import gql from "graphql-tag";
 import moment from 'moment'
 import classnames from 'classnames'
 
@@ -16,10 +18,8 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 
 import {AuthContext} from "../context/AuthContext";
-
-import {useMutation} from "@apollo/client";
-import gql from "graphql-tag";
 import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
+import {getUserColor} from "../utils/colorGenerator";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -118,7 +118,7 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, use
                 <CardHeader
                     className={classes.root}
                     avatar={
-                        <Avatar className={classes.avatar} style={{backgroundColor: getRandomColor()}}>
+                        <Avatar className={classes.avatar} style={{backgroundColor: getUserColor(user._id)}}>
                             {user.username.charAt(0).toUpperCase()}
                         </Avatar>}
                     title={user.username}
@@ -150,21 +150,13 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, use
     )
 }
 
-function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
 const TOGGLE_LIKE_QUERY = gql`
     mutation toggleLike($id: ID!){
         toggleLike(postId: $id){
             _id body createdAt likesCount commentsCount
             user {
                 username
+                _id
             }
             likes {
                 user {

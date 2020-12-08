@@ -1,6 +1,4 @@
 import React, {useContext} from 'react'
-
-import gql from "graphql-tag";
 import {useMutation} from "@apollo/client";
 
 import Dialog from "@material-ui/core/Dialog";
@@ -13,7 +11,7 @@ import TextField from "@material-ui/core/TextField";
 import {makeStyles} from "@material-ui/core";
 
 import {AlertContext} from "../context/AlertContext";
-import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
+import {CREATE_POST_QUERY, FETCH_POSTS_QUERY} from "../utils/graphql-queries";
 
 // Slider component used to make a slider animation for Dialog
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -136,30 +134,5 @@ const CreatePostModal = ({handleClose, open}) => {
         </Dialog>
     )
 }
-
-const CREATE_POST_QUERY = gql`
-    mutation createPost(
-        $body: String!
-    ) {
-        createPost(body: $body) {
-            _id body createdAt likesCount commentsCount
-            user {
-                username
-            }
-            likes {
-                user {
-                    username
-                }
-            }
-            comments {
-                _id
-                body
-                user {
-                    username
-                }
-            }
-        }
-    }
-`
 
 export default CreatePostModal;
