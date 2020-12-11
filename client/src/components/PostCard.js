@@ -1,7 +1,6 @@
 import React, {useContext} from 'react';
 import {Link} from "react-router-dom";
 import {useMutation} from "@apollo/client";
-import gql from "graphql-tag";
 import moment from 'moment'
 import classnames from 'classnames'
 
@@ -18,7 +17,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 
 import {AuthContext} from "../context/AuthContext";
-import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
+import {FETCH_POSTS_QUERY, TOGGLE_LIKE_QUERY} from "../utils/graphql-queries";
 import {getUserColor} from "../utils/colorGenerator";
 
 const useStyles = makeStyles(theme => ({
@@ -87,28 +86,13 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, use
     const hasUserLiked = !!likes.find(like => like.user._id === currentUser?._id)
 
     const [toggleLike] = useMutation(TOGGLE_LIKE_QUERY, {
-        variables: {id: _id},
-        update(cache, result) {
-
-            const data = cache.readQuery({
-                query: FETCH_POSTS_QUERY,
-            });
-
-            // Updating posts from cache by replacing liked post from the response
-            cache.writeQuery({
-                query: FETCH_POSTS_QUERY,
-                data: {
-                    getPosts: data.getPosts.map(post => post._id === _id ? result.data.toggleLike : post),
-                },
-            });
-        }
+        variables: {id: _id}
     })
 
     const onLikeClick = () => {
-        if (!currentUser._id) {
+        if (!currentUser?._id) {
             return
         }
-
         toggleLike()
     }
 
@@ -149,31 +133,5 @@ const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, use
         </Grid>
     )
 }
-
-const TOGGLE_LIKE_QUERY = gql`
-    mutation toggleLike($id: ID!){
-        toggleLike(postId: $id){
-            _id body createdAt likesCount commentsCount
-            user {
-                username
-                _id
-            }
-            likes {
-                user {
-                    username
-                    _id
-                }
-            }
-            comments {
-                _id
-                body
-                user {
-                    username
-                }
-            }
-        }
-    }
-`
-
 
 export default PostCard
