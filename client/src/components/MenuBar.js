@@ -69,14 +69,6 @@ export default function ButtonAppBar() {
     const {user, logout} = useContext(AuthContext)
     const [dialogOpen, setDialogOpen] = useState(false)
 
-    const openDialog = () => {
-        setDialogOpen(true)
-    }
-
-    const closeDialog = () => {
-        setDialogOpen(false)
-    }
-
     return (
         <div className={classes.root}>
             <AppBar position="static" className={classes.appbar}>
@@ -91,7 +83,7 @@ export default function ButtonAppBar() {
                             <Button
                                 className={classes.primaryButton}
                                 startIcon={<AddIcon/>}
-                                onClick={openDialog}
+                                onClick={() => setDialogOpen(!dialogOpen)}
                             >
                                 Create
                             </Button>
@@ -137,7 +129,7 @@ export default function ButtonAppBar() {
                     }
                 </Toolbar>
             </AppBar>
-            <CreatePostModal open={dialogOpen} handleClose={closeDialog}/>
+            <CreatePostModal open={dialogOpen} handleClose={() => setDialogOpen(false)}/>
         </div>
     );
 }

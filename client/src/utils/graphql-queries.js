@@ -106,3 +106,30 @@ export const TOGGLE_LIKE_QUERY = gql`
         }
     }
 `
+
+export const GET_POST_QUERY = gql`
+    query getPost($id: ID!){
+        getPost(_id: $id){
+            _id body createdAt likesCount commentsCount
+            user {
+                username
+                _id
+            }
+            likes {
+                user {
+                    username
+                    _id
+                }
+            }
+            comments {
+                _id
+                body
+                user {
+                    username
+                    _id
+                    createdAt
+                }
+            }
+        }
+    }
+`

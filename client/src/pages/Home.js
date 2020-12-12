@@ -41,7 +41,9 @@ const Home = () => {
                             ))
                             :
                             data && data.getPosts.map(post => (
-                                <PostCard post={post} key={post._id}/>
+                                <Grid item xl={4} md={4} key={post._id}>
+                                    <PostCard post={post}/>
+                                </Grid>
                             ))
                     }
                 </Grid>

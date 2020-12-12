@@ -1,24 +1,19 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {Link} from "react-router-dom";
-import {useMutation} from "@apollo/client";
 import moment from 'moment'
 import classnames from 'classnames'
 
-import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import {CardHeader, makeStyles} from "@material-ui/core";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
-import FavoriteIcon from '@material-ui/icons/Favorite';
 import ChatIcon from '@material-ui/icons/Chat';
-import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 
-import {AuthContext} from "../context/AuthContext";
-import {FETCH_POSTS_QUERY, TOGGLE_LIKE_QUERY} from "../utils/graphql-queries";
-import {getUserColor} from "../utils/colorGenerator";
+import LikeButton from "./LikeButton";
+import UserAvatar from "./UserAvatar";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -36,9 +31,6 @@ const useStyles = makeStyles(theme => ({
         '& .MuiCardHeader-root': {
             paddingBottom: 0
         }
-    },
-    avatar: {
-        color: '#fff'
     },
     body: {
         height: 80,
@@ -80,57 +72,38 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, user, _id}}) => {
+const PostCard = ({post: {body, createdAt, commentsCount, likesCount, likes, user, _id}, single}) => {
     const classes = useStyles()
-    const {user: currentUser} = useContext(AuthContext)
-    const hasUserLiked = !!likes.find(like => like.user._id === currentUser?._id)
-
-    const [toggleLike] = useMutation(TOGGLE_LIKE_QUERY, {
-        variables: {id: _id}
-    })
-
-    const onLikeClick = () => {
-        if (!currentUser?._id) {
-            return
-        }
-        toggleLike()
-    }
 
     return (
-        <Grid item xl={4} md={4}>
-            <Card className={classnames(classes.root, classes.card)}>
-                <CardHeader
-                    className={classes.root}
-                    avatar={
-                        <Avatar className={classes.avatar} style={{backgroundColor: getUserColor(user._id)}}>
-                            {user.username.charAt(0).toUpperCase()}
-                        </Avatar>}
-                    title={user.username}
-                    subheader={moment(createdAt).fromNow()}
-                />
-                <CardContent>
-                    <Typography variant="body2" color="textSecondary" component="p" className={classes.body}>
-                        {body}
-                    </Typography>
-                </CardContent>
-                <CardActions className={classes.cardFooter} disableSpacing>
-                    <IconButton onClick={onLikeClick}>
-                        <FavoriteIcon
-                            className={classnames(hasUserLiked ? classes.likeIconLiked : classes.icon, classes.likeIcon)}/>
-                        <span className={classes.count} style={{left: 30}}>{likesCount}</span>
-                    </IconButton>
-                    <IconButton>
-                        <ChatIcon className={classes.icon}/>
-                        <span className={classes.count}>{commentsCount}</span>
-                    </IconButton>
-                    <Button size="small" className={classes.postFooterButton}>
+        <Card className={classnames(classes.root, classes.card)}>
+            <CardHeader
+                className={classes.root}
+                avatar={<UserAvatar userId={user._id} username={user.username}/>}
+                title={user.username}
+                subheader={moment(createdAt).fromNow()}
+            />
+            <CardContent>
+                <Typography variant="body2" color="textSecondary" component="p" className={classes.body}>
+                    {body}
+                </Typography>
+            </CardContent>
+            <CardActions className={classes.cardFooter} disableSpacing>
+                <LikeButton classes={classes} postId={_id} likesCount={likesCount} likes={likes}/>
+                <IconButton>
+                    <ChatIcon className={classes.icon}/>
+                    <span className={classes.count}>{commentsCount}</span>
+                </IconButton>
+                {!single
+                    ? <Button size="small" className={classes.postFooterButton}>
                         <Link to={`/post/${_id}`}>
                             Read more
                         </Link>
                     </Button>
-                </CardActions>
-            </Card>
-        </Grid>
+                    : null
+                }
+            </CardActions>
+        </Card>
     )
 }
 

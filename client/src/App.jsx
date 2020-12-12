@@ -11,6 +11,7 @@ import MenuBar from "./components/MenuBar";
 import {theme} from "./theme";
 import AuthContextProvider from "./context/AuthContext";
 import AlertContextProvider from "./context/AlertContext";
+import SinglePost from "./pages/SinglePost";
 
 const App = () => {
     return (
@@ -24,6 +25,7 @@ const App = () => {
                             <Route exact path='/' component={Home}/>
                             <Route exact path='/login' component={Login}/>
                             <Route exact path='/register' render={() => <Login register/>}/>
+                            <Route exact path='/post/:postId' component={SinglePost}/>
                         </div>
                     </AlertContextProvider>
                 </AuthContextProvider>
