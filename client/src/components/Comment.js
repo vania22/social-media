@@ -5,10 +5,10 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
+
 import UserAvatar from "./UserAvatar";
 
 const Comment = ({comment}) => {
-
     return (
         <>
             <ListItem alignItems="flex-start">
@@ -31,7 +31,7 @@ const Comment = ({comment}) => {
                     }
                 />
             </ListItem>
-            <Divider variant="inset" component="li"/>
+            <Divider variant="inset" component="li" style={{backgroundColor: '#fff'}}/>
         </>
     )
 }

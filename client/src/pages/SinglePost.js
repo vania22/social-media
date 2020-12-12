@@ -2,7 +2,7 @@ import React, {useContext} from 'react'
 import {useParams} from 'react-router-dom'
 import {useQuery} from "@apollo/client";
 
-import {Button, makeStyles} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -10,13 +10,13 @@ import List from "@material-ui/core/List";
 
 import Comment from "../components/Comment";
 import PostCard from "../components/PostCard";
-import {GET_POST_QUERY} from "../utils/graphql-queries";
+import AddCommentSection from "../components/AddCommentSection";
 import {AuthContext} from "../context/AuthContext";
-import AddIcon from "@material-ui/icons/Add";
+import {GET_POST_QUERY} from "../utils/graphql-queries";
 
 const useStyles = makeStyles(theme => ({
     container: {
-        padding: '30px 30px',
+        padding: '30px 120px',
         maxWidth: 1500
     },
     spinner: {
@@ -70,14 +70,7 @@ const SinglePost = () => {
                     </List>
                 </>
             }
-            {!user &&
-            <Button
-                className={classes.primaryButton}
-                startIcon={<AddIcon/>}
-            >
-                Add Comment
-            </Button>
-            }
+            {user && <AddCommentSection postId={postId}/>}
         </Container>
     )
 }

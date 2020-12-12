@@ -60,6 +60,7 @@ export const FETCH_POSTS_QUERY = gql`
                 _id
                 body
                 user {
+                    _id
                     username
                 }
             }
@@ -86,6 +87,7 @@ export const CREATE_POST_QUERY = gql`
                 _id
                 body
                 user {
+                    _id
                     username
                 }
             }
@@ -128,6 +130,31 @@ export const GET_POST_QUERY = gql`
                     username
                     _id
                     createdAt
+                }
+            }
+        }
+    }
+`
+
+export const CREATE_COMMENT_QUERY = gql`
+    mutation createComment(
+        $postId: ID!
+        $body: String!
+    ) {
+        createComment(
+            input: {
+                postId: $postId
+                body: $body
+            }
+        ){
+            _id commentsCount
+            comments {
+                _id
+                body
+                createdAt
+                user {
+                    _id
+                    username
                 }
             }
         }
