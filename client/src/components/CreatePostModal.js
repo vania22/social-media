@@ -83,10 +83,11 @@ const CreatePostModal = ({handleClose, open}) => {
 
     const onPostCreate = () => {
         if (values.body.trim()) {
-            createPost()
+            createPost().catch(e => setAlert(e.message, 'error'))
             handleClose()
         } else {
             setAlert("Post can't have empty body", 'error')
+            handleClose()
         }
     }
 

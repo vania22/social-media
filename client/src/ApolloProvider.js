@@ -21,9 +21,28 @@ const authLink = setContext((_, { headers }) => {
     }
 });
 
+const cache = new InMemoryCache({
+    typePolicies: {
+        Query: {
+            fields: {
+                getPosts: {
+                    // Don't cache separate results based on
+                    // any of this field's arguments.
+                    keyArgs: false,
+                    // Concatenate the incoming list items with
+                    // the existing list items.
+                    merge(existing = [], incoming) {
+                        return [...existing, ...incoming];
+                    },
+                }
+            }
+        }
+    }
+})
+
 const client = new ApolloClient( {
     link: authLink.concat(httpLink),
-    cache: new InMemoryCache()
+    cache
 })
 
 export default (

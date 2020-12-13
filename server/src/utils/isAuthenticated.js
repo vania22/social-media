@@ -19,14 +19,14 @@ export const isAuthenticated = async (req) => {
             // Verifying if decoded _id matches a user in Database
             const user = await User.findById(_id);
             if (!user) {
-                throw new AuthenticationError('Not authorized')
+                throw new AuthenticationError('Not authorized, please log in')
             }
 
             return user
         } catch (e) {
-            throw new AuthenticationError('Invalid/expired token')
+            throw new AuthenticationError('Session has expired, please re-login')
         }
     }
 
-    throw new AuthenticationError('Invalid/expired token')
+    throw new AuthenticationError('Session has expired, please re-login')
 }

@@ -43,8 +43,9 @@ export const LOGIN_USER = gql`
 `
 
 export const FETCH_POSTS_QUERY = gql`
+    query getPosts($skip: Int!)
     {
-        getPosts{
+        getPosts(skip: $skip){
             _id body createdAt likesCount commentsCount
             user {
                 username

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {useMutation} from "@apollo/client";
 
 import TextField from "@material-ui/core/TextField";
@@ -6,6 +6,7 @@ import {Button, makeStyles} from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 
 import {CREATE_COMMENT_QUERY} from "../utils/graphql-queries";
+import {AlertContext} from "../context/AlertContext";
 
 const useStyles = makeStyles(theme => ({
     commentsSection: {
@@ -45,6 +46,7 @@ const useStyles = makeStyles(theme => ({
 
 const AddCommentSection = ({postId}) => {
     const classes = useStyles()
+    const {setAlert} = useContext(AlertContext)
     const [body, setBody] = useState('')
     const CHARACTER_LIMIT = 255;
 
@@ -53,7 +55,12 @@ const AddCommentSection = ({postId}) => {
     })
 
     const onCreateComment = () => {
-        createComment()
+        if (body.trim()) {
+            createComment().catch(e => setAlert(e.message, 'error'))
+            setBody('')
+        } else {
+            setAlert("Comment can't be empty", 'error')
+        }
     }
 
     return (

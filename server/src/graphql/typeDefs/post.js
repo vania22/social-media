@@ -2,7 +2,7 @@ import {gql} from 'apollo-server';
 
 export const postDefs = gql`
     type Query {
-        getPosts: [Post]!
+        getPosts(skip: Int!): [Post]!
         getPost(_id: ID!): Post!
     }
 
