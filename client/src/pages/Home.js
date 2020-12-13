@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import {useQuery} from "@apollo/client";
 
 import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
