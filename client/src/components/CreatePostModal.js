@@ -65,16 +65,12 @@ const CreatePostModal = ({handleClose, open}) => {
     const [createPost, {loading}] = useMutation(CREATE_POST_QUERY, {
             variables: values,
             update(cache, result) {
-                // Getting data from cache
-                const data = cache.readQuery({
-                    query: FETCH_POSTS_QUERY,
-                });
 
                 // Updating posts from cache by adding newly created post
                 cache.writeQuery({
                     query: FETCH_POSTS_QUERY,
                     data: {
-                        getPosts: [result.data.createPost, ...data.getPosts],
+                        getPosts: [result.data.createPost]
                     },
                 });
             }

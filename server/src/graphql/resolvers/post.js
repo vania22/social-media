@@ -3,7 +3,7 @@ import {isAuthenticated} from "../../utils/isAuthenticated";
 export const post = {
     Query: {
         async getPosts(parent, {skip}, {Post}, info) {
-            return Post.find().sort({createdAt: -1}).limit(9).skip(skip)
+            return Post.find().sort({['createdAt']: -1}).limit(9).skip(skip)
         },
         async getPost(parent, {_id}, {Post}, info) {
             const post = await Post.findById(_id)

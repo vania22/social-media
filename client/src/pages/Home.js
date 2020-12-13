@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import {useQuery} from "@apollo/client";
 
 import {FETCH_POSTS_QUERY} from "../utils/graphql-queries";
@@ -10,6 +10,7 @@ import Grid from "@material-ui/core/Grid";
 
 import PostCard from "../components/PostCard";
 import PostCardSkeleton from "../components/PostCardSkeleton";
+import {AlertContext} from "../context/AlertContext";
 
 
 const useStyles = makeStyles(theme => ({
@@ -29,7 +30,7 @@ const useStyles = makeStyles(theme => ({
         background: '#fff',
         color: theme.palette.primary.main,
         marginLeft: 20,
-        marginTop: 25,
+        marginTop: 35,
         maxWidth: 200,
         '&:hover': {
             background: '#fff',
@@ -40,21 +41,25 @@ const useStyles = makeStyles(theme => ({
 
 const Home = () => {
     const classes = useStyles()
+    const {setAlert} = useContext(AlertContext)
     let skip = useRef(0)
+
     const {loading, data, fetchMore} = useQuery(FETCH_POSTS_QUERY, {
         variables: {skip: skip.current},
         onCompleted() {
-            if(data.getPosts.length !== 9) {
-                skip.current = data.getPosts.length
-            }
+            skip.current = data.getPosts.length
         }
     })
 
-
     const loadMore = () => {
         fetchMore({variables: {skip: skip.current + 9}})
+            .then(({data}) => {
+                if (data.getPosts.length === 0) {
+                    setAlert('You reached the end of the list', 'info')
+                }
+            })
+
         skip.current += 9
-        console.log(skip.current)
     }
 
     return (

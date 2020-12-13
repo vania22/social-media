@@ -82,6 +82,7 @@ export const CREATE_POST_QUERY = gql`
             likes {
                 user {
                     username
+                    _id
                 }
             }
             comments {

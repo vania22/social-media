@@ -4,7 +4,6 @@ import {setContext} from "@apollo/client/link/context";
 
 import App from './App';
 
-
 const httpLink = createHttpLink({
     uri: 'http://localhost:5000'
 })
@@ -26,13 +25,15 @@ const cache = new InMemoryCache({
         Query: {
             fields: {
                 getPosts: {
-                    // Don't cache separate results based on
-                    // any of this field's arguments.
                     keyArgs: false,
                     // Concatenate the incoming list items with
                     // the existing list items.
                     merge(existing = [], incoming) {
-                        return [...existing, ...incoming];
+                        if(incoming.length === 1){
+                            return [...incoming, ...existing]
+                        }
+
+                        return  [...existing, ...incoming]
                     },
                 }
             }
